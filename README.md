@@ -30,7 +30,7 @@ No Python installation required for pre-built executables!
 
 ## Prerequisites (For Development)
 
-- Python 3.6 or higher
+- Python 3.9 or higher (3.11+ recommended)
 - Required packages (see Installation)
 
 ## Installation
