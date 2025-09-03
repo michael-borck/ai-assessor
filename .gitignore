@@ -66,10 +66,24 @@ Thumbs.db
 # Project specific
 logs/
 feedback/
+output/
 icon.ico
 config.ini
+*.log
+
+# PyInstaller build files
+*.spec
+build/
+dist/
+
 # Allow template files
 !config.ini.template
 # Default prompts directory should be included
 !default_prompts/
 !default_prompts/*
+
+# Pre-commit
+.pre-commit-cache/
+
+# Pytest cache
+.pytest_cache/

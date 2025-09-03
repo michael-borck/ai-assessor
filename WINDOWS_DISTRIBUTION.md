@@ -61,7 +61,7 @@ AI_Assessor/
 ├── config.ini           # Pre-configured settings
 ├── README.txt           # Instructions for users
 ├── run_ai_assessor.bat  # Batch file to run the app
-├── prompts/            
+├── prompts/
 │   ├── system_prompt.txt
 │   ├── user_prompt.txt
 │   ├── example_system_prompt.txt
