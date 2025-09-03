@@ -1,6 +1,9 @@
 # AI Assessor
 
-AI Assessor is a Python application designed to automate the grading of student submissions using OpenAI's API. It now features both a graphical user interface and a command-line interface, making it flexible for various use cases.
+> **⚠️ Legacy Project Notice**
+> This is a legacy codebase in maintenance mode. Development is limited to critical bug fixes only. New feature development has been discontinued.
+
+AI Assessor is a Python application designed to automate the grading of student submissions using OpenAI's API. It features both a graphical user interface and a command-line interface, making it flexible for various use cases.
 
 ## Features
 
@@ -14,7 +17,18 @@ AI Assessor is a Python application designed to automate the grading of student 
 - Grade individual or all student submissions
 - View student work alongside generated feedback
 
-## Prerequisites
+## Download
+
+Pre-built executables are available for download:
+
+**[📥 Download Latest Release](https://github.com/michael-borck/ai-assessor/releases)**
+
+- **Windows**: `AI_Assessor_Windows_vX.X.X.zip` - Extract and run `AI_Assessor.exe`
+- **Linux**: `AI_Assessor_Linux_vX.X.X.AppImage` - Make executable and run directly
+
+No Python installation required for pre-built executables!
+
+## Prerequisites (For Development)
 
 - Python 3.6 or higher
 - Required packages (see Installation)
@@ -119,15 +133,33 @@ Available commands:
   python aiassessor_cli.py interactive
   ```
 
-## Contributing
+## Maintenance Mode
 
-Contributions to AI Assessor are welcome! Please follow these steps:
+**This project is in maintenance mode.** Contributions are limited to:
 
-1. Fork the repository.
-2. Create a new branch for your feature (`git checkout -b feature/AmazingFeature`).
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
-4. Push to the branch (`git push origin feature/AmazingFeature`).
-5. Open a pull request.
+- ✅ Critical bug fixes
+- ✅ Security vulnerability patches
+- ✅ Documentation updates
+- ❌ New features
+- ❌ Major refactoring
+
+### Reporting Issues
+
+If you encounter bugs or security issues:
+
+1. Check existing [GitHub Issues](https://github.com/michael-borck/ai-assessor/issues)
+2. Create a new issue with detailed reproduction steps
+3. Label it as `bug` or `security` as appropriate
+
+### Contributing Bug Fixes
+
+For bug fixes only:
+
+1. Fork the repository
+2. Create a branch for your fix (`git checkout -b fix/issue-description`)
+3. Make minimal changes to address the specific issue
+4. Ensure all tests pass and code quality checks pass
+5. Submit a pull request with clear description of the fix
 
 ## License
 
