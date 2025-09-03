@@ -1,0 +1,171 @@
+name: Build Multi-Platform Executables
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Windows executable
+      run: python build_windows.py
+
+    - name: Upload Windows executable (artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: AI-Assessor-Windows
+        path: dist/AI_Assessor/
+        retention-days: 30
+
+    - name: Create Windows release archive
+      if: github.event_name == 'release'
+      run: |
+        cd dist
+        Compress-Archive -Path AI_Assessor -DestinationPath AI_Assessor_Windows_${{ github.event.release.tag_name }}.zip
+
+    - name: Upload Windows release asset
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dist/AI_Assessor_Windows_${{ github.event.release.tag_name }}.zip
+        asset_name: AI_Assessor_Windows_${{ github.event.release.tag_name }}.zip
+        asset_content_type: application/zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          python3-tk \
+          python3-dev \
+          build-essential \
+          libfuse2 \
+          file
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build Linux executable
+      run: |
+        pyinstaller \
+          --onedir \
+          --windowed \
+          --name "AI_Assessor" \
+          --add-data "prompts:prompts" \
+          --add-data "support:support" \
+          --add-data "submissions:submissions" \
+          --hidden-import "tkinter" \
+          --hidden-import "tkinter.ttk" \
+          --hidden-import "tkinter.messagebox" \
+          --hidden-import "tkinter.filedialog" \
+          --hidden-import "PIL._tkinter_finder" \
+          ai_assessor_main.py
+
+    - name: Download AppImage tools
+      run: |
+        wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
+
+    - name: Create AppImage directory structure
+      run: |
+        mkdir -p AI_Assessor.AppDir/usr/bin
+        mkdir -p AI_Assessor.AppDir/usr/share/applications
+        mkdir -p AI_Assessor.AppDir/usr/share/icons/hicolor/256x256/apps
+
+        # Copy the built application
+        cp -r dist/AI_Assessor/* AI_Assessor.AppDir/usr/bin/
+
+        # Create desktop file
+        cat > AI_Assessor.AppDir/usr/share/applications/ai-assessor.desktop << EOF
+        [Desktop Entry]
+        Name=AI Assessor
+        Exec=AI_Assessor
+        Icon=ai-assessor
+        Type=Application
+        Categories=Education;Office;
+        Comment=AI-powered tool for grading student submissions
+        EOF
+
+        # Create a simple icon (you can replace this with a proper icon file)
+        cat > AI_Assessor.AppDir/usr/share/icons/hicolor/256x256/apps/ai-assessor.svg << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+          <rect width="256" height="256" fill="#2563eb" rx="32"/>
+          <text x="128" y="140" font-family="sans-serif" font-size="80" fill="white" text-anchor="middle" font-weight="bold">AI</text>
+          <text x="128" y="200" font-family="sans-serif" font-size="24" fill="#93c5fd" text-anchor="middle">Assessor</text>
+        </svg>
+        EOF
+
+        # Create AppRun script
+        cat > AI_Assessor.AppDir/AppRun << EOF
+        #!/bin/bash
+        cd "\$(dirname "\$0")/usr/bin"
+        exec "./AI_Assessor" "\$@"
+        EOF
+        chmod +x AI_Assessor.AppDir/AppRun
+
+        # Copy desktop file to root
+        cp AI_Assessor.AppDir/usr/share/applications/ai-assessor.desktop AI_Assessor.AppDir/
+        cp AI_Assessor.AppDir/usr/share/icons/hicolor/256x256/apps/ai-assessor.svg AI_Assessor.AppDir/
+
+    - name: Build AppImage
+      run: |
+        ./appimagetool-x86_64.AppImage AI_Assessor.AppDir AI_Assessor-x86_64.AppImage
+
+    - name: Upload Linux AppImage (artifact)
+      uses: actions/upload-artifact@v4
+      with:
+        name: AI-Assessor-Linux-AppImage
+        path: AI_Assessor-x86_64.AppImage
+        retention-days: 30
+
+    - name: Rename AppImage for release
+      if: github.event_name == 'release'
+      run: |
+        mv AI_Assessor-x86_64.AppImage AI_Assessor_Linux_${{ github.event.release.tag_name }}.AppImage
+
+    - name: Upload Linux release asset
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: AI_Assessor_Linux_${{ github.event.release.tag_name }}.AppImage
+        asset_name: AI_Assessor_Linux_${{ github.event.release.tag_name }}.AppImage
+        asset_content_type: application/octet-stream
