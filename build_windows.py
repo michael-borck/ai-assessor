@@ -33,7 +33,10 @@ def build_windows_executable():
     in_venv = hasattr(sys, "real_prefix") or (
         hasattr(sys, "base_prefix") and sys.base_prefix != sys.prefix
     )
-    if not in_venv:
+    # Check if running in CI/automated environment
+    is_ci = os.getenv("CI") or os.getenv("GITHUB_ACTIONS")
+
+    if not in_venv and not is_ci:
         print("WARNING: It's recommended to run this script in a virtual environment.")
         print("Please consider creating and activating a virtual environment first:")
         print("1. python -m venv venv")
@@ -45,6 +48,8 @@ def build_windows_executable():
         if response.lower() != "y":
             print("Exiting. Please run the script in a virtual environment.")
             sys.exit(0)
+    elif not in_venv and is_ci:
+        print("INFO: Running in CI environment, skipping virtual environment check.")
 
     # Check PyInstaller installation
     pyinstaller_found = False
