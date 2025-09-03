@@ -26,9 +26,15 @@ AI Assessor is a Python application that automates grading of student submission
 - **Check linting**: `flake8 .`
 - **Run pre-commit checks**: `pre-commit run --all-files`
 
-### Windows Distribution
-- **Setup build environment**: `setup_build_windows.bat`
-- **Build executable**: `python build_windows.py`
+### Distribution Builds
+- **Windows executable**: `python build_windows.py`
+- **Linux AppImage**: `python build_linux.py`
+- **Setup Windows build environment**: `setup_build_windows.bat`
+
+### Automated Releases
+- **GitHub Actions**: Automatically builds Windows and Linux executables on release
+- **Release process**: Create a GitHub release with a version tag (e.g., `v1.0.0`)
+- **Artifacts**: Windows ZIP and Linux AppImage automatically uploaded to release
 
 ## Architecture
 
