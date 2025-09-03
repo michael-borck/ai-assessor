@@ -5,6 +5,8 @@ Basic tests for file utility functions.
 import os
 import tempfile
 
+import pytest
+
 from ai_assessor.utils.file_utils import FileUtils
 
 
@@ -36,5 +38,6 @@ class TestFileUtils:
 
     def test_get_docx_files_nonexistent_directory(self):
         """Test handling of non-existent directory."""
-        files = FileUtils.get_docx_files("/nonexistent/directory")
-        assert files == []
+        # Should raise FileNotFoundError for non-existent directory
+        with pytest.raises(FileNotFoundError):
+            FileUtils.get_docx_files("/nonexistent/directory")
