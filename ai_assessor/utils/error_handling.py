@@ -1,5 +1,6 @@
 import logging
 import os
+import tempfile
 import traceback
 
 
@@ -10,17 +11,30 @@ class ErrorHandler:
 
     # Set up logging
     @staticmethod
-    def setup_logging(log_file="aiassessor.log", level=logging.INFO):
+    def setup_logging(log_file=None, level=logging.INFO):
         """
         Set up logging for the application.
 
         Args:
-            log_file (str): Path to the log file
+            log_file (str): Path to the log file (defaults to user home directory)
             level (int): Logging level
         """
+        if log_file is None:
+            # Default to user's home directory or temp if running from AppImage
+            if os.getenv("APPIMAGE"):
+                # Running as AppImage - use temp directory
+                log_file = os.path.join(os.path.expanduser("~"), "aiassessor.log")
+            else:
+                # Running normally - use current directory
+                log_file = "aiassessor.log"
+
         log_dir = os.path.dirname(log_file)
         if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+            try:
+                os.makedirs(log_dir)
+            except OSError:
+                # If we can't create the log directory, fall back to temp
+                log_file = os.path.join(tempfile.gettempdir(), "aiassessor.log")
 
         logging.basicConfig(
             filename=log_file,
