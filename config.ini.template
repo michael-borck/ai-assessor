@@ -1,12 +1,12 @@
 [Paths]
 SystemPromptPath = prompts/system_prompt.txt
 UserPromptPath = prompts/user_prompt.txt
-SupportFolder = 
-SubmissionsFolder = 
-OutputFolder = 
+SupportFolder =
+SubmissionsFolder =
+OutputFolder =
 
 [API]
-Key = 
+Key =
 DefaultModel = gpt-4-turbo
 Temperature = 0.7
 

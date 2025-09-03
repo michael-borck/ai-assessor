@@ -66,13 +66,13 @@ echo Setup complete! Now you can run the build script.
 echo.
 
 REM Ask user if they want to continue with build
-set /p run_now=Run the build script now? (y/n): 
+set /p run_now=Run the build script now? (y/n):
 
 if /i "%run_now%"=="y" (
     echo.
     echo Running build script...
     python build_windows.py
-    
+
     REM Check if build was successful
     if %errorlevel% neq 0 (
         echo.

@@ -48,7 +48,7 @@ If you are not using Anaconda, you can set up a virtual environment using Python
 
    ```bash
    python3 -m venv aiassessor_env
-   
+
    # Activate:
    # Windows: aiassessor_env\Scripts\activate
    # macOS/Linux: source aiassessor_env/bin/activate
