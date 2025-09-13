@@ -276,9 +276,11 @@ class ConfigView(ttk.Frame):
             # Use askdirectory which allows typing new paths
             directory = filedialog.askdirectory(
                 title=f"Select or Create {directory_type} Directory",
-                initialdir=os.path.dirname(initial_dir)
-                if os.path.exists(os.path.dirname(initial_dir))
-                else os.getcwd(),
+                initialdir=(
+                    os.path.dirname(initial_dir)
+                    if os.path.exists(os.path.dirname(initial_dir))
+                    else os.getcwd()
+                ),
             )
         else:
             directory = filedialog.askdirectory(
