@@ -30,9 +30,10 @@ def main():
 
     # Get API key from environment or config
     api_key = os.getenv("OPENAI_API_KEY") or config_manager.get_value("API", "Key", "")
+    base_url = config_manager.get_value("API", "BaseURL", "")
 
-    # Initialize API client
-    api_client = OpenAIClient(api_key)
+    # Initialize API client (compatible with any OpenAI-compatible provider)
+    api_client = OpenAIClient(api_key, base_url)
 
     # Initialize assessor
     assessor = Assessor(api_client, config_manager)
