@@ -149,6 +149,12 @@ class AIAssessorGUI:
             "api_key": tk.StringVar(
                 value=self.config_manager.get_value("API", "Key", "")
             ),
+            "base_url": tk.StringVar(
+                value=self.config_manager.get_value("API", "BaseURL", "")
+            ),
+            "ssl_verify": tk.StringVar(
+                value=self.config_manager.get_value("API", "SSLVerify", "True")
+            ),
             "system_prompt_path": tk.StringVar(
                 value=self.config_manager.get_value("Paths", "SystemPromptPath", "")
             ),
@@ -500,6 +506,12 @@ A tool for automatically grading student submissions using OpenAI's language mod
         """Handle window close event and save configuration."""
         # Save configuration values from StringVars
         self.config_manager.set_value("API", "Key", self.string_vars["api_key"].get())
+        self.config_manager.set_value(
+            "API", "BaseURL", self.string_vars["base_url"].get()
+        )
+        self.config_manager.set_value(
+            "API", "SSLVerify", self.config_tab.ssl_verify_var.get()
+        )
         self.config_manager.set_value(
             "Paths", "SystemPromptPath", self.string_vars["system_prompt_path"].get()
         )

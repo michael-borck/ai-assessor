@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from tkinter import filedialog, scrolledtext, ttk
+from tkinter import filedialog, messagebox, scrolledtext, ttk
 
 from ...utils.document_processor import DocumentProcessor
 
@@ -18,13 +18,17 @@ class ConfigView(ttk.Frame):
             parent: The parent widget
             config_manager: The configuration manager
             string_vars: Dictionary of StringVar objects for configuration
-            available_models: List of available OpenAI models (optional)
+            available_models: List of available models from the LLM provider (optional)
         """
         super().__init__(parent)
         self.config_manager = config_manager
         self.string_vars = string_vars
         self.document_processor = DocumentProcessor()
         self.available_models = available_models or []
+        self.ssl_verify_var = tk.BooleanVar(
+            value=self.config_manager.get_value("API", "SSLVerify", "True").lower()
+            == "true"
+        )
 
         # Setup UI
         self.setup_ui()
@@ -37,16 +41,29 @@ class ConfigView(ttk.Frame):
 
         # API Configuration
         row = 0
-        ttk.Label(self, text="OpenAI API Key:").grid(
+        ttk.Label(self, text="API Key:").grid(
             row=row, column=0, sticky="w", padx=5, pady=5
         )
         ttk.Entry(self, textvariable=self.string_vars["api_key"]).grid(
             row=row, column=1, sticky="ew", padx=5, pady=5
         )
 
+        row += 1
+        ttk.Label(self, text="Base URL (e.g., http://localhost:8080): ").grid(
+            row=row, column=0, sticky="w", padx=5, pady=5
+        )
+        ttk.Entry(self, textvariable=self.string_vars["base_url"]).grid(
+            row=row, column=1, sticky="ew", padx=5, pady=5
+        )
+
+        row += 1
+        ttk.Checkbutton(
+            self, text="Verify SSL Certificates", variable=self.ssl_verify_var
+        ).grid(row=row, column=0, columnspan=2, sticky="w", padx=5, pady=5)
+
         # Path Configuration
         row += 1
-        ttk.Label(self, text="System Prompt Path:").grid(
+        ttk.Label(self, text="System Prompt File:").grid(
             row=row, column=0, sticky="w", padx=5, pady=5
         )
         path_frame = ttk.Frame(self)
@@ -63,7 +80,7 @@ class ConfigView(ttk.Frame):
         ).pack(side="right")
 
         row += 1
-        ttk.Label(self, text="User Prompt Path:").grid(
+        ttk.Label(self, text="User Prompt File:").grid(
             row=row, column=0, sticky="w", padx=5, pady=5
         )
         path_frame = ttk.Frame(self)
@@ -152,12 +169,17 @@ class ConfigView(ttk.Frame):
         self.model_dropdown = ttk.Combobox(
             model_frame, textvariable=self.string_vars["model"], values=model_options
         )
+        self.model_dropdown.pack(side="left", fill="x", expand=True)
+
+        # Add button to test connection
+        ttk.Button(
+            model_frame, text="Test Connection", command=self.test_connection
+        ).pack(side="right", padx=5)
 
         # Add button to refresh models
         ttk.Button(
             model_frame, text="Refresh Models", command=self.refresh_models
         ).pack(side="right", padx=5)
-        self.model_dropdown.pack(side="left", fill="x", expand=True)
 
         # Add button to add new model
         ttk.Button(model_frame, text="Manage Models", command=self.manage_models).pack(
@@ -240,14 +262,52 @@ class ConfigView(ttk.Frame):
     def browse_directory(self, directory_type, string_var):
         """
         Browse for a directory and update the corresponding path.
+        Creates the directory if it doesn't exist (with user confirmation).
 
         Args:
             directory_type (str): Type of directory to browse for
             string_var (StringVar): StringVar to update with the selected path
         """
-        directory = filedialog.askdirectory(title=f"Select {directory_type} Directory")
+        # For output folder, allow typing a new path
+        if directory_type == "Output":
+            # Start with current value if exists
+            initial_dir = string_var.get() if string_var.get() else os.getcwd()
+
+            # Use askdirectory which allows typing new paths
+            directory = filedialog.askdirectory(
+                title=f"Select or Create {directory_type} Directory",
+                initialdir=os.path.dirname(initial_dir)
+                if os.path.exists(os.path.dirname(initial_dir))
+                else os.getcwd(),
+            )
+        else:
+            directory = filedialog.askdirectory(
+                title=f"Select {directory_type} Directory"
+            )
+
         if directory:
-            string_var.set(directory)
+            # Check if directory exists
+            if not os.path.exists(directory):
+                # Ask user if they want to create it
+                response = messagebox.askyesno(
+                    "Create Directory",
+                    f"The directory '{directory}' does not exist.\n\nWould you like to create it?",
+                )
+
+                if response:
+                    try:
+                        os.makedirs(directory, exist_ok=True)
+                        string_var.set(directory)
+                        messagebox.showinfo(
+                            "Success", f"Directory created successfully:\n{directory}"
+                        )
+                    except Exception as e:
+                        messagebox.showerror(
+                            "Error", f"Failed to create directory:\n{str(e)}"
+                        )
+                # else: User chose not to create, don't update the path
+            else:
+                string_var.set(directory)
 
     def load_initial_prompts(self):
         """Load initial prompts if paths are set."""
@@ -280,9 +340,9 @@ class ConfigView(ttk.Frame):
                 self.system_prompt_editor.delete(1.0, tk.END)
                 self.system_prompt_editor.insert(tk.END, content)
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Failed to load system prompt: {e}")
+                messagebox.showerror("Error", f"Failed to load system prompt: {e}")
         else:
-            tk.messagebox.showwarning(
+            messagebox.showwarning(
                 "Warning", "Please specify a valid system prompt path."
             )
 
@@ -293,11 +353,11 @@ class ConfigView(ttk.Frame):
             try:
                 content = self.system_prompt_editor.get(1.0, tk.END)
                 self.document_processor.write_text_file(path, content)
-                tk.messagebox.showinfo("Success", "System prompt saved successfully.")
+                messagebox.showinfo("Success", "System prompt saved successfully.")
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Failed to save system prompt: {e}")
+                messagebox.showerror("Error", f"Failed to save system prompt: {e}")
         else:
-            tk.messagebox.showwarning("Warning", "Please specify a system prompt path.")
+            messagebox.showwarning("Warning", "Please specify a system prompt path.")
 
     def load_user_prompt(self):
         """Load user prompt from the specified path."""
@@ -308,9 +368,9 @@ class ConfigView(ttk.Frame):
                 self.user_prompt_editor.delete(1.0, tk.END)
                 self.user_prompt_editor.insert(tk.END, content)
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Failed to load user prompt: {e}")
+                messagebox.showerror("Error", f"Failed to load user prompt: {e}")
         else:
-            tk.messagebox.showwarning(
+            messagebox.showwarning(
                 "Warning", "Please specify a valid user prompt path."
             )
 
@@ -321,133 +381,98 @@ class ConfigView(ttk.Frame):
             try:
                 content = self.user_prompt_editor.get(1.0, tk.END)
                 self.document_processor.write_text_file(path, content)
-                tk.messagebox.showinfo("Success", "User prompt saved successfully.")
+                messagebox.showinfo("Success", "User prompt saved successfully.")
             except Exception as e:
-                tk.messagebox.showerror("Error", f"Failed to save user prompt: {e}")
+                messagebox.showerror("Error", f"Failed to save user prompt: {e}")
         else:
-            tk.messagebox.showwarning("Warning", "Please specify a user prompt path.")
+            messagebox.showwarning("Warning", "Please specify a user prompt path.")
+
+    def test_connection(self):
+        """Test the connection to the LLM provider and list available models."""
+        api_key = self.string_vars["api_key"].get()
+        base_url = self.string_vars["base_url"].get()
+        ssl_verify = self.ssl_verify_var.get()
+
+        print("--- Testing Connection ---")
+        print(f"API Key: {api_key}")
+        print(f"Base URL: {base_url}")
+        print(f"SSL Verify: {ssl_verify}")
+        print("--------------------------")
+
+        if not api_key:
+            print("API Key is required.")
+            return
+
+        from ...core.api_client import OpenAIClient
+
+        client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
+
+        try:
+            models = client.list_models()
+            model_ids = [model.id for model in models.data]
+            messagebox.showinfo(
+                "Connection Successful",
+                f"Successfully connected to the provider. Found {len(model_ids)} models:\n\n"
+                + "\n".join(model_ids),
+            )
+        except Exception:
+            import traceback
+
+            print(traceback.format_exc())
+            messagebox.showerror(
+                "Connection Failed",
+                "Failed to connect to the provider. Please check the terminal for more details.",
+            )
 
     def refresh_models(self):
-        """Refresh available models from OpenAI API."""
+        """Refresh available models from the LLM provider."""
         api_key = self.string_vars["api_key"].get()
+        base_url = self.string_vars["base_url"].get()
+        ssl_verify = self.ssl_verify_var.get()
         if not api_key:
-            tk.messagebox.showwarning(
-                "API Key Required", "Please enter your OpenAI API key first."
+            messagebox.showwarning(
+                "API Key Required", "Please enter your API key first."
             )
             return
 
-        # Show loading dialog
-        loading = tk.Toplevel(self)
-        loading.title("Fetching Models")
-        loading.geometry("300x100")
-        loading.transient(self)
-        loading.grab_set()
+        from ...core.api_client import OpenAIClient
 
-        status_var = tk.StringVar(value="Fetching available models...")
-        ttk.Label(loading, textvariable=status_var, padding=20).pack()
+        client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
 
-        progress = ttk.Progressbar(loading, mode="indeterminate")
-        progress.pack(fill="x", padx=20)
-        progress.start()
+        try:
+            models = client.list_models()
+            # Include all models from the provider, not just those matching specific patterns
+            # This allows for custom/local models with any naming convention
+            all_models = [model.id for model in models.data]
+            self.available_models = sorted(all_models) if all_models else []
+            self.model_dropdown["values"] = self.available_models
 
-        # Add cancel button
-        ttk.Button(loading, text="Cancel", command=loading.destroy).pack(pady=10)
-
-        # Set a timeout flag
-        fetch_complete = False
-
-        # Timeout function
-        def check_timeout():
-            if not fetch_complete and loading.winfo_exists():
-                loading.destroy()
-                tk.messagebox.showwarning(
-                    "Timeout",
-                    "Request to fetch models timed out.\n"
-                    "Using default models instead.",
-                )
-                self.model_dropdown["values"] = [
-                    "gpt-4-turbo",
-                    "gpt-4o",
-                    "gpt-3.5-turbo",
-                ]
-
-        # Set 10 second timeout
-        timeout_id = self.winfo_toplevel().after(10000, check_timeout)
-
-        def fetch_models():
-            nonlocal fetch_complete
-            try:
-                import httpx
-                from openai import OpenAI
-
-                # Use timeout for the API request
-                client = OpenAI(
-                    api_key=api_key,
-                    timeout=httpx.Timeout(8.0),  # 8 second timeout for requests
-                )
-
-                # Update status
-                self.winfo_toplevel().after(
-                    0, lambda: status_var.set("Connecting to OpenAI API...")
-                )
-
-                models = client.models.list()
-
-                # Filter for chat models
-                chat_models = [
-                    model.id
-                    for model in models.data
-                    if model.id.startswith(("gpt-3.5", "gpt-4"))
-                ]
-
-                # Sort models: put gpt-4 first, then gpt-3.5
-                gpt4_models = sorted([m for m in chat_models if m.startswith("gpt-4")])
-                gpt35_models = sorted(
-                    [m for m in chat_models if m.startswith("gpt-3.5")]
-                )
-
-                self.available_models = gpt4_models + gpt35_models
-
+            if self.available_models:
                 # Save models to config.ini
-                # First clear existing models section
                 if self.config_manager.config.has_section("Models"):
                     self.config_manager.config.remove_section("Models")
-
                 self.config_manager.config.add_section("Models")
-
-                # Add each model to config
                 for model_id in self.available_models:
                     self.config_manager.set_value("Models", model_id, model_id)
-
-                # Save config
                 self.config_manager.save()
 
-                # Mark as complete to avoid timeout
-                fetch_complete = True
-
-                # Cancel timeout
-                self.winfo_toplevel().after_cancel(timeout_id)
-
-                # Update dropdown on main thread
-                self.winfo_toplevel().after(
-                    0, lambda: self._update_model_dropdown(loading)
+                messagebox.showinfo(
+                    "Models Updated",
+                    f"Found {len(self.available_models)} available models.",
                 )
-            except Exception as error:
-                # Mark as complete to avoid timeout
-                fetch_complete = True
-
-                # Cancel timeout
-                self.winfo_toplevel().after_cancel(timeout_id)
-
-                # Handle error on main thread
-                self.winfo_toplevel().after(
-                    0, lambda err=error: self._handle_refresh_error(err, loading)
+            else:
+                messagebox.showwarning(
+                    "No Models Found",
+                    "No compatible models were found. Using default models.",
                 )
+        except Exception:
+            import traceback
 
-        # Run in thread to avoid blocking UI
-        import threading
-
-        threading.Thread(target=fetch_models, daemon=True).start()
+            print(traceback.format_exc())
+            messagebox.showerror(
+                "Connection Failed",
+                "Failed to connect to the provider. Please check the terminal for more details.",
+            )
 
     def _update_model_dropdown(self, loading_dialog):
         """Update model dropdown with fetched models."""
@@ -462,7 +487,7 @@ class ConfigView(ttk.Frame):
                     loading_dialog.destroy()
 
                     # Show success message
-                    tk.messagebox.showinfo(
+                    messagebox.showinfo(
                         "Models Updated",
                         f"Found {len(self.available_models)} available models.\n"
                         f"These models have been saved to your configuration.",
@@ -492,7 +517,7 @@ class ConfigView(ttk.Frame):
                                 pass
                 else:
                     loading_dialog.destroy()
-                    tk.messagebox.showwarning(
+                    messagebox.showwarning(
                         "No Models Found",
                         "No compatible models were found. Using default models.",
                     )
@@ -537,7 +562,7 @@ class ConfigView(ttk.Frame):
                 loading_dialog.destroy()
 
             # Show error message
-            tk.messagebox.showerror("Error", f"Failed to fetch models: {str(error)}")
+            messagebox.showerror("Error", f"Failed to fetch models: {str(error)}")
 
             # Fall back to default models
             self.model_dropdown["values"] = ["gpt-4-turbo", "gpt-4o", "gpt-3.5-turbo"]
@@ -562,7 +587,7 @@ class ConfigView(ttk.Frame):
         description = (
             "Manage the available models for AI Assessor.\n\n"
             "You can add custom models, remove models you don't use, "
-            "or use 'Refresh Models' button to fetch the latest models from OpenAI."
+            "or use 'Refresh Models' button to fetch the latest models from your provider."
         )
         ttk.Label(frame, text=description, wraplength=480).grid(
             row=0, column=0, columnspan=2, sticky="w", pady=(0, 15)
@@ -591,10 +616,10 @@ class ConfigView(ttk.Frame):
         buttons_frame = ttk.Frame(frame)
         buttons_frame.grid(row=2, column=0, columnspan=2, sticky="ew", pady=10)
 
-        # Refresh button to update models from OpenAI
+        # Refresh button to update models from provider
         ttk.Button(
             buttons_frame,
-            text="Refresh Models from OpenAI",
+            text="Refresh Models from Provider",
             command=lambda: self._refresh_from_manage_dialog(dialog),
         ).pack(side=tk.LEFT, padx=5)
 
@@ -650,7 +675,7 @@ class ConfigView(ttk.Frame):
             model_id = model_id_var.get().strip()
 
             if not name or not model_id:
-                tk.messagebox.showwarning(
+                messagebox.showwarning(
                     "Warning", "Please enter both a model name and ID."
                 )
                 return
@@ -674,7 +699,7 @@ class ConfigView(ttk.Frame):
                 self.config_manager.config["Models"].keys()
             )
 
-            tk.messagebox.showinfo("Success", f"Added model: {name}")
+            messagebox.showinfo("Success", f"Added model: {name}")
 
         ttk.Button(action_buttons, text="Add Custom Model", command=add_model).pack(
             side=tk.LEFT, padx=5
@@ -707,13 +732,13 @@ class ConfigView(ttk.Frame):
         # Get selected model
         selected = model_listbox.curselection()
         if not selected:
-            tk.messagebox.showwarning("Warning", "Please select a model to remove.")
+            messagebox.showwarning("Warning", "Please select a model to remove.")
             return
 
         model_name = model_listbox.get(selected[0])
 
         # Confirm removal
-        if tk.messagebox.askyesno(
+        if messagebox.askyesno(
             "Confirm", f"Are you sure you want to remove {model_name}?"
         ):
             # Remove from config
@@ -729,4 +754,4 @@ class ConfigView(ttk.Frame):
                 self.config_manager.config["Models"].keys()
             )
 
-            tk.messagebox.showinfo("Success", f"Removed model: {model_name}")
+            messagebox.showinfo("Success", f"Removed model: {model_name}")

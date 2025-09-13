@@ -17,11 +17,15 @@ class ConfigManager:
             "SubmissionsFolder": "",
             "OutputFolder": "",
         },
-        "API": {"Key": "", "DefaultModel": "gpt-4-turbo", "Temperature": "0.7"},
+        "API": {
+            "Key": "",
+            "DefaultModel": "gpt-4-turbo",
+            "Temperature": "0.7",
+            "BaseURL": "",
+            "SSLVerify": "True",
+        },
         "Models": {
-            "gpt-3.5-turbo": "gpt-3.5-turbo",
-            "gpt-4-turbo": "gpt-4-turbo",
-            "gpt-4o": "gpt-4o",
+            # Default models - will be populated from provider
         },
     }
 
