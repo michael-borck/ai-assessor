@@ -58,10 +58,22 @@ class OpenAIClient:
         Raises:
             Exception: If API call fails
         """
+        import logging
+
         try:
             # Initialize client if not already done
             if not self.client:
                 self.initialize()
+
+            # Debug logging
+            logging.info(f"API Call Details:")
+            logging.info(f"  Model: {model}")
+            logging.info(f"  Temperature: {temperature}")
+            logging.info(f"  Max tokens: {max_tokens}")
+            logging.info(f"  Base URL: {self.base_url}")
+            logging.info(f"  SSL Verify: {self.ssl_verify}")
+            logging.info(f"  System content length: {len(system_content)} chars")
+            logging.info(f"  User content length: {len(user_content)} chars")
 
             # Use the new API format
             response = self.client.chat.completions.create(
@@ -75,6 +87,12 @@ class OpenAIClient:
             )
 
             # Extract the response (new API format)
-            return response.choices[0].message.content.strip()
+            result = response.choices[0].message.content.strip()
+            logging.info(f"API call successful, response length: {len(result)} chars")
+            return result
         except Exception as e:
+            logging.error(f"API call failed with error: {str(e)}")
+            logging.error(f"Error type: {type(e).__name__}")
+            import traceback
+            logging.error(f"Full traceback: {traceback.format_exc()}")
             raise Exception(f"API call failed: {str(e)}")
