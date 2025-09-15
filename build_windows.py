@@ -287,6 +287,21 @@ exe = EXE(pyz,
     for folder in folders:
         os.makedirs(os.path.join(dist_folder, folder), exist_ok=True)
 
+    # Copy the generated executable to the distribution folder
+    exe_source = os.path.join("dist", "AI_Assessor.exe")
+    exe_dest = os.path.join(dist_folder, "AI_Assessor.exe")
+
+    if os.path.exists(exe_source):
+        shutil.copy2(exe_source, exe_dest)
+        print(f"Copied executable from {exe_source} to {exe_dest}")
+    else:
+        print(f"WARNING: Executable not found at {exe_source}")
+        # List contents of dist folder for debugging
+        if os.path.exists("dist"):
+            print(f"Contents of dist folder: {os.listdir('dist')}")
+        else:
+            print("dist folder does not exist!")
+
     # Copy example files to prompts folder
     prompts_dest = os.path.join(dist_folder, "prompts")
     for file in [
