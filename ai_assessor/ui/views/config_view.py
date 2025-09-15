@@ -49,11 +49,19 @@ class ConfigView(ttk.Frame):
         )
 
         row += 1
-        ttk.Label(self, text="Base URL (e.g., http://localhost:8080): ").grid(
+        ttk.Label(self, text="Base URL (required):").grid(
             row=row, column=0, sticky="w", padx=5, pady=5
         )
-        ttk.Entry(self, textvariable=self.string_vars["base_url"]).grid(
-            row=row, column=1, sticky="ew", padx=5, pady=5
+        base_url_frame = ttk.Frame(self)
+        base_url_frame.grid(row=row, column=1, sticky="ew", padx=5, pady=5)
+        ttk.Entry(base_url_frame, textvariable=self.string_vars["base_url"]).pack(
+            side="top", fill="x", expand=True
+        )
+
+        # Add examples label
+        examples_text = "Examples: https://api.openai.com (OpenAI) | http://localhost:11434 (Ollama)"
+        ttk.Label(base_url_frame, text=examples_text, font=("Helvetica", 8), foreground="gray").pack(
+            side="top", anchor="w", pady=(2,0)
         )
 
         row += 1
@@ -401,15 +409,25 @@ class ConfigView(ttk.Frame):
         print(f"SSL Verify: {ssl_verify}")
         print("--------------------------")
 
+        # Validate required fields
         if not api_key:
-            print("API Key is required.")
+            messagebox.showerror("Error", "API Key is required.")
+            return
+
+        if not base_url or base_url.strip() == "":
+            messagebox.showerror(
+                "Error",
+                "Base URL is required.\n\nExamples:\n" +
+                "• OpenAI: https://api.openai.com\n" +
+                "• Ollama: http://localhost:11434\n" +
+                "• LM Studio: http://localhost:1234"
+            )
             return
 
         from ...core.api_client import OpenAIClient
 
-        client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
-
         try:
+            client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
             models = client.list_models()
             model_ids = [model.id for model in models.data]
             messagebox.showinfo(
@@ -417,13 +435,19 @@ class ConfigView(ttk.Frame):
                 f"Successfully connected to the provider. Found {len(model_ids)} models:\n\n"
                 + "\n".join(model_ids),
             )
-        except Exception:
+        except ValueError as e:
+            # Handle validation errors (missing API key/base URL)
+            messagebox.showerror("Configuration Error", str(e))
+        except Exception as e:
             import traceback
 
             print(traceback.format_exc())
             messagebox.showerror(
                 "Connection Failed",
-                "Failed to connect to the provider. Please check the terminal for more details.",
+                f"Failed to connect to the provider:\n\n{str(e)}\n\nPlease check:\n" +
+                "• Base URL is correct and accessible\n" +
+                "• API key is valid\n" +
+                "• Network connectivity"
             )
 
     def refresh_models(self):
@@ -431,17 +455,25 @@ class ConfigView(ttk.Frame):
         api_key = self.string_vars["api_key"].get()
         base_url = self.string_vars["base_url"].get()
         ssl_verify = self.ssl_verify_var.get()
+        # Validate required fields
         if not api_key:
-            messagebox.showwarning(
-                "API Key Required", "Please enter your API key first."
+            messagebox.showerror("Error", "API Key is required.")
+            return
+
+        if not base_url or base_url.strip() == "":
+            messagebox.showerror(
+                "Error",
+                "Base URL is required.\n\nExamples:\n" +
+                "• OpenAI: https://api.openai.com\n" +
+                "• Ollama: http://localhost:11434\n" +
+                "• LM Studio: http://localhost:1234"
             )
             return
 
         from ...core.api_client import OpenAIClient
 
-        client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
-
         try:
+            client = OpenAIClient(api_key=api_key, base_url=base_url, ssl_verify=ssl_verify)
             models = client.list_models()
             # Include all models from the provider, not just those matching specific patterns
             # This allows for custom/local models with any naming convention
@@ -467,13 +499,19 @@ class ConfigView(ttk.Frame):
                     "No Models Found",
                     "No compatible models were found. Using default models.",
                 )
-        except Exception:
+        except ValueError as e:
+            # Handle validation errors (missing API key/base URL)
+            messagebox.showerror("Configuration Error", str(e))
+        except Exception as e:
             import traceback
 
             print(traceback.format_exc())
             messagebox.showerror(
                 "Connection Failed",
-                "Failed to connect to the provider. Please check the terminal for more details.",
+                f"Failed to connect to the provider:\n\n{str(e)}\n\nPlease check:\n" +
+                "• Base URL is correct and accessible\n" +
+                "• API key is valid\n" +
+                "• Network connectivity"
             )
 
     def _update_model_dropdown(self, loading_dialog):

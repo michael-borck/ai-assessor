@@ -13,8 +13,15 @@ class OpenAIClient:
 
     def initialize(self):
         """Initialize the API client for OpenAI-compatible providers."""
-        url = self.base_url
-        if url and not url.endswith("/v1"):
+        # Validate required parameters
+        if not self.api_key:
+            raise ValueError("API key is required")
+
+        if not self.base_url or self.base_url.strip() == "":
+            raise ValueError("Base URL is required. Examples: https://api.openai.com (OpenAI) or http://localhost:11434 (Ollama)")
+
+        url = self.base_url.strip()
+        if not url.endswith("/v1"):
             url = url.rstrip("/") + "/v1"
 
         http_client = httpx.Client(verify=self.ssl_verify)
