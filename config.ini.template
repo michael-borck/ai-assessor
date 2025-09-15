@@ -7,8 +7,16 @@ OutputFolder =
 
 [API]
 Key =
+BaseURL =
 DefaultModel = gpt-4-turbo
 Temperature = 0.7
+SSLVerify = True
+
+# BaseURL Examples:
+# For OpenAI: https://api.openai.com
+# For Ollama: http://localhost:11434
+# For LM Studio: http://localhost:1234
+# For other providers: <your-provider-base-url>
 
 [Models]
 gpt-3.5-turbo = gpt-3.5-turbo
