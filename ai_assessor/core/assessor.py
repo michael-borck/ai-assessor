@@ -124,7 +124,8 @@ class Assessor:
             self.api_client.update(
                 api_key=self.config.get_value("API", "Key"),
                 base_url=self.config.get_value("API", "BaseURL"),
-                ssl_verify=self.config.get_value("API", "SSLVerify", "True").lower() == "true",
+                ssl_verify=self.config.get_value("API", "SSLVerify", "True").lower()
+                == "true",
             )
 
             # Call the API

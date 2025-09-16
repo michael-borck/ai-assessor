@@ -3,6 +3,7 @@ import tkinter as tk
 import pytest
 import os
 
+
 @pytest.mark.skipif(os.environ.get("DISPLAY") is None, reason="requires a display")
 def test_basic_gui():
     root = tk.Tk()
