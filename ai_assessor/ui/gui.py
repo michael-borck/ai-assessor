@@ -5,6 +5,7 @@ from tkinter import PhotoImage, messagebox, ttk
 
 from openai import OpenAI
 
+from .. import __version__
 from .views.config_view import ConfigView
 from .views.grading_view import GradingView
 
@@ -61,7 +62,7 @@ class SplashScreen:
 
         version_label = tk.Label(
             self.splash_root,
-            text="Version 1.0",
+            text=f"Version {__version__}",
             font=("Helvetica", 10),
             background="#f0f0f0",
         )
