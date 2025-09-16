@@ -85,7 +85,7 @@ class OpenAIClient:
                 self.initialize()
 
             # Debug logging to help diagnose submission failures
-            logging.info(f"API Call Details:")
+            logging.info("API Call Details:")
             logging.info(f"  Model: {model}")
             logging.info(f"  Temperature: {temperature}")
             logging.info(f"  Max tokens: {max_tokens}")
