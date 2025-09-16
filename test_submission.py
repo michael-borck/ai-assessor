@@ -13,6 +13,7 @@ from ai_assessor.utils import ErrorHandler
 # Set up logging
 ErrorHandler.setup_logging()
 
+
 def main():
     # Load environment variables
     load_dotenv()
@@ -75,6 +76,7 @@ def main():
         return
 
     from ai_assessor.utils.file_utils import FileUtils
+
     docx_files = FileUtils.get_docx_files(submissions_folder)
 
     if not docx_files:
@@ -102,7 +104,7 @@ def main():
             support_files=None,  # Skip support files for initial test
             output_folder=None,  # Don't save output for test
             model=model,
-            temperature=0.7
+            temperature=0.7,
         )
 
         if success:
@@ -115,16 +117,18 @@ def main():
     except Exception as e:
         print(f"✗ EXCEPTION: {e}")
         import traceback
+
         print(f"Full traceback:\n{traceback.format_exc()}")
 
     # Check log file for additional details
     log_file = os.path.expanduser("~/aiassessor.log")
     if os.path.exists(log_file):
         print(f"\n=== Recent Log Entries ===")
-        with open(log_file, 'r') as f:
+        with open(log_file, "r") as f:
             lines = f.readlines()
             for line in lines[-10:]:  # Show last 10 lines
                 print(line.strip())
+
 
 if __name__ == "__main__":
     main()

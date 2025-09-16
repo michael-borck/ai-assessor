@@ -18,7 +18,9 @@ class OpenAIClient:
             raise ValueError("API key is required")
 
         if not self.base_url or self.base_url.strip() == "":
-            raise ValueError("Base URL is required. Examples: https://api.openai.com (OpenAI) or http://localhost:11434 (Ollama)")
+            raise ValueError(
+                "Base URL is required. Examples: https://api.openai.com (OpenAI) or http://localhost:11434 (Ollama)"
+            )
 
         url = self.base_url.strip()
         if not url.endswith("/v1"):
@@ -111,5 +113,6 @@ class OpenAIClient:
             logging.error(f"API call failed with error: {str(e)}")
             logging.error(f"Error type: {type(e).__name__}")
             import traceback
+
             logging.error(f"Full traceback: {traceback.format_exc()}")
             raise Exception(f"API call failed: {str(e)}")

@@ -14,7 +14,8 @@ from docx import Document
 # Set up logging
 ErrorHandler.setup_logging()
 
-@patch('ai_assessor.core.api_client.OpenAI')
+
+@patch("ai_assessor.core.api_client.OpenAI")
 def test_api(mock_openai):
     # Create a dummy config.ini file
     with open("config.ini", "w") as f:
@@ -39,10 +40,14 @@ def test_api(mock_openai):
     # Mock the OpenAI client
     mock_client = mock_openai.return_value
     mock_client.models.list.return_value.data = [
-        type('model', (object,), {'id': 'gpt-3.5-turbo'})()
+        type("model", (object,), {"id": "gpt-3.5-turbo"})()
     ]
     mock_client.chat.completions.create.return_value.choices = [
-        type('choice', (object,), {'message': type('message', (object,), {'content': 'Test feedback'})()})()
+        type(
+            "choice",
+            (object,),
+            {"message": type("message", (object,), {"content": "Test feedback"})()},
+        )()
     ]
 
     # Initialize configuration
@@ -64,9 +69,11 @@ def test_api(mock_openai):
     assessor = Assessor(api_client, config_manager)
 
     # Test submission processing
-    system_prompt = "You are a helpful teacher. Grade this submission and provide brief feedback."
+    system_prompt = (
+        "You are a helpful teacher. Grade this submission and provide brief feedback."
+    )
     user_prompt = "Please grade the following student work:"
-    
+
     # Create a dummy submission file
     submissions_folder = "submissions"
     if not os.path.exists(submissions_folder):
@@ -82,7 +89,7 @@ def test_api(mock_openai):
         system_prompt=system_prompt,
         user_prompt=user_prompt,
         model=model,
-        temperature=0.7
+        temperature=0.7,
     )
     assert success is True
     assert feedback == "Test feedback"
