@@ -18,6 +18,8 @@ permissions:
 jobs:
   build-windows:
     runs-on: windows-latest
+    outputs:
+      RELEASE_TAG: ${{ env.RELEASE_TAG }}
 
     steps:
     - uses: actions/checkout@v4
@@ -45,6 +47,7 @@ jobs:
 
     - name: Get Release Tag
       if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+      shell: bash
       run: |
         if [ "${{ github.event_name }}" == "release" ]; then
           echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
@@ -172,22 +175,13 @@ jobs:
         path: AI_Assessor-x86_64.AppImage
         retention-days: 30
 
-    - name: Get Release Tag
-      if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
-      run: |
-        if [ "${{ github.event_name }}" == "release" ]; then
-          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-        else
-          echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
-        fi
-
     - name: Rename AppImage for release
       if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
       run: |
-        mv AI_Assessor-x86_64.AppImage AI_Assessor_Linux_${{ env.RELEASE_TAG }}.AppImage
+        mv AI_Assessor-x86_64.AppImage AI_Assessor_Linux_${{ needs.build-windows.outputs.RELEASE_TAG }}.AppImage
 
     - name: Upload Linux release asset
       if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
-      run: gh release upload ${{ env.RELEASE_TAG }} AI_Assessor_Linux_${{ env.RELEASE_TAG }}.AppImage
+      run: gh release upload ${{ needs.build-windows.outputs.RELEASE_TAG }} AI_Assessor_Linux_${{ needs.build-windows.outputs.RELEASE_TAG }}.AppImage
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
