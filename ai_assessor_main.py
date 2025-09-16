@@ -3,7 +3,6 @@
 AI Assessor - An AI-powered tool for grading student submissions.
 """
 
-
 import os
 import tkinter as tk
 
