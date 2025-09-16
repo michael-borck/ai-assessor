@@ -144,7 +144,8 @@ block_cipher = None
 a = Analysis(['ai_assessor_main.py'],
              pathex=[],
              binaries=[],
-             datas=[('ai_assessor/__init__.py', 'ai_assessor')],
+             datas=[('ai_assessor/__init__.py', 'ai_assessor'),
+                    ('config.ini.template', '.')],
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},
@@ -156,7 +157,7 @@ a = Analysis(['ai_assessor_main.py'],
              noarchive=False)
 
 # Add data files
-a.datas += [('config.ini.template', '.')]
+
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
