@@ -373,7 +373,7 @@ class GradingView(ttk.Frame):
                     )
                     self.update_progress_ui(progress_var, i)
                     self.update_progress_ui(
-                        status_var, f"Grading {filename}... (connecting to OpenAI)"
+                        status_var, f"Grading {filename}... (connecting to {self.string_vars['base_url'].get()})"
                     )
 
                     # Update main status
@@ -635,7 +635,7 @@ class GradingView(ttk.Frame):
                     self.update_progress_ui(count_var, f"{i}/{file_count} completed")
                     self.update_progress_ui(progress_var, i)
                     self.update_progress_ui(
-                        status_var, f"Grading {filename}... (connecting to OpenAI)"
+                        status_var, f"Grading {filename}... (connecting to {self.string_vars['base_url'].get()})"
                     )
 
                     # Update main status
