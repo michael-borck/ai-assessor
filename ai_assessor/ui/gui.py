@@ -214,6 +214,7 @@ class AIAssessorGUI:
         api_key = self.string_vars["api_key"].get()
         base_url = self.string_vars["base_url"].get()
         ssl_verify = self.string_vars["ssl_verify"].get().lower() == "true"
+        logging.debug(f"AIAssessorGUI.update_api_client_settings: api_key={api_key}, base_url={base_url}, ssl_verify={ssl_verify}")
         self.assessor.api_client.update(api_key, base_url, ssl_verify)
         self.update_api_status()
 
