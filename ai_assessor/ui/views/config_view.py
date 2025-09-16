@@ -214,6 +214,7 @@ class ConfigView(ttk.Frame):
         self.system_prompt_editor.grid(
             row=row, column=0, columnspan=2, sticky="ew", padx=5, pady=5
         )
+        self.rowconfigure(row, weight=1)
 
         # Buttons for system prompt
         row += 1
@@ -237,6 +238,7 @@ class ConfigView(ttk.Frame):
         self.user_prompt_editor.grid(
             row=row, column=0, columnspan=2, sticky="ew", padx=5, pady=5
         )
+        self.rowconfigure(row, weight=1)
 
         # Buttons for user prompt
         row += 1
