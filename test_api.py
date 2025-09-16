@@ -55,6 +55,7 @@ def test_api(mock_openai):
 
     # Explicitly set config_manager.config for testing purposes
     import configparser
+
     temp_config = configparser.ConfigParser()
     temp_config.read("config.ini")
     config_manager.config = temp_config

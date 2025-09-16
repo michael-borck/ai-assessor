@@ -30,7 +30,9 @@ class OpenAIClient:
             url = url.rstrip("/") + "/v1"
             logging.debug(f"OpenAIClient.initialize - Modified base_url: '{url}'")
         else:
-            logging.debug(f"OpenAIClient.initialize - Base_url already ends with /v1: '{url}'")
+            logging.debug(
+                f"OpenAIClient.initialize - Base_url already ends with /v1: '{url}'"
+            )
 
         http_client = httpx.Client(verify=self.ssl_verify)
         self.client = OpenAI(
@@ -45,7 +47,9 @@ class OpenAIClient:
         self.api_key = api_key
         self.base_url = base_url
         self.ssl_verify = ssl_verify
-        logging.debug(f"OpenAIClient.update: api_key={api_key}, base_url={base_url}, ssl_verify={ssl_verify}")
+        logging.debug(
+            f"OpenAIClient.update: api_key={api_key}, base_url={base_url}, ssl_verify={ssl_verify}"
+        )
         self.initialize()
 
     def list_models(self):
