@@ -75,6 +75,7 @@ config.ini
 *.spec
 build/
 dist/
+ai_assessor/__version__.py
 
 # Allow template files
 !config.ini.template
