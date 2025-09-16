@@ -43,6 +43,13 @@ class ConfigView(ttk.Frame):
 
     def _on_api_setting_change(self, *args):
         """Callback for when an API-related setting changes."""
+        # Update config_manager with the new values
+        self.config_manager.set_value("API", "Key", self.string_vars["api_key"].get())
+        self.config_manager.set_value("API", "BaseURL", self.string_vars["base_url"].get())
+        self.config_manager.set_value("API", "SSLVerify", self.ssl_verify_var.get())
+        self.config_manager.set_value("API", "DefaultModel", self.string_vars["model"].get())
+        self.config_manager.set_value("API", "Temperature", self.string_vars["temperature"].get())
+
         if self.master_gui:
             self.master_gui.update_api_client_settings()
 
