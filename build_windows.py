@@ -128,6 +128,12 @@ def build_windows_executable():
         print("Then run this script again.")
         sys.exit(1)
 
+    # Clean up __pycache__ to ensure latest __init__.py is used
+    pycache_dir = os.path.join("ai_assessor", "__pycache__")
+    if os.path.exists(pycache_dir):
+        print(f"Deleting {pycache_dir}...")
+        shutil.rmtree(pycache_dir)
+
     # Create build spec for PyInstaller
     print("Creating PyInstaller spec file...")
     spec_content = """
@@ -138,7 +144,7 @@ block_cipher = None
 a = Analysis(['ai_assessor_main.py'],
              pathex=[],
              binaries=[],
-             datas=[],
+             datas=[('ai_assessor/__init__.py', 'ai_assessor/__init__.py', 'PYSOURCE')],
              hiddenimports=[],
              hookspath=[],
              hooksconfig={},

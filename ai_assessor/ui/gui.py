@@ -209,6 +209,14 @@ class AIAssessorGUI:
         if not self.string_vars["api_key"].get():
             self.show_first_run_dialog()
 
+    def update_api_client_settings(self):
+        """Update the API client with the latest settings from the GUI string_vars."""
+        api_key = self.string_vars["api_key"].get()
+        base_url = self.string_vars["base_url"].get()
+        ssl_verify = self.string_vars["ssl_verify"].get().lower() == "true"
+        self.assessor.api_client.update(api_key, base_url, ssl_verify)
+        self.update_api_status()
+
     def fetch_available_models(self, api_key):
         """Fetch available models from OpenAI API."""
         try:
@@ -263,6 +271,7 @@ class AIAssessorGUI:
             self.config_manager,
             self.string_vars,
             self.available_models,
+            self, # Pass reference to self (AIAssessorGUI instance)
         )
         self.tab_control.add(self.config_tab, text="Settings")
 
