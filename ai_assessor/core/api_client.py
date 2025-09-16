@@ -29,6 +29,16 @@ class OpenAIClient:
             api_key=self.api_key, base_url=url, http_client=http_client
         )
 
+    def update(self, api_key, base_url, ssl_verify):
+        """
+        Update the API client with new settings.
+        This is useful if the user changes settings in the UI.
+        """
+        self.api_key = api_key
+        self.base_url = base_url
+        self.ssl_verify = ssl_verify
+        self.initialize()
+
     def list_models(self):
         """
         List available models from the provider.
