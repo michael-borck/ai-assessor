@@ -53,6 +53,12 @@ def test_api(mock_openai):
     # Initialize configuration
     config_manager = ConfigManager("config.ini")
 
+    # Explicitly set config_manager.config for testing purposes
+    import configparser
+    temp_config = configparser.ConfigParser()
+    temp_config.read("config.ini")
+    config_manager.config = temp_config
+
     # Get API settings
     api_key = "test_api_key"
     base_url = "https://api.openai.com"
