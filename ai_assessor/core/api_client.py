@@ -1,4 +1,5 @@
 import httpx
+import logging
 from openai import OpenAI
 
 
