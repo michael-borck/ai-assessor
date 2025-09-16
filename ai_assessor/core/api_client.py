@@ -22,9 +22,14 @@ class OpenAIClient:
                 "Base URL is required. Examples: https://api.openai.com (OpenAI) or http://localhost:11434 (Ollama)"
             )
 
+        logging.debug(f"OpenAIClient.initialize - Original base_url: '{self.base_url}'")
         url = self.base_url.strip()
+        logging.debug(f"OpenAIClient.initialize - Stripped base_url: '{url}'")
         if not url.endswith("/v1"):
             url = url.rstrip("/") + "/v1"
+            logging.debug(f"OpenAIClient.initialize - Modified base_url: '{url}'")
+        else:
+            logging.debug(f"OpenAIClient.initialize - Base_url already ends with /v1: '{url}'")
 
         http_client = httpx.Client(verify=self.ssl_verify)
         self.client = OpenAI(
