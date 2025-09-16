@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import tkinter as tk
+import pytest
+import os
 
+@pytest.mark.skipif(os.environ.get("DISPLAY") is None, reason="requires a display")
 def test_basic_gui():
     root = tk.Tk()
     root.title("Test GUI")
@@ -14,9 +17,7 @@ def test_basic_gui():
     button = tk.Button(root, text="Close", command=close_app)
     button.pack(pady=10)
 
-    print("Starting GUI...")
-    root.mainloop()
-    print("GUI closed")
+    # Close the window after a short time
+    root.after(100, close_app)
 
-if __name__ == "__main__":
-    test_basic_gui()
+    root.mainloop()
