@@ -9,12 +9,30 @@ from dotenv import load_dotenv
 from ai_assessor.config import ConfigManager
 from ai_assessor.core import Assessor, OpenAIClient
 from ai_assessor.utils import ErrorHandler
+from docx import Document
 
 # Set up logging
 ErrorHandler.setup_logging()
 
 @patch('ai_assessor.core.api_client.OpenAI')
 def test_api(mock_openai):
+    # Create a dummy config.ini file
+    with open("config.ini", "w") as f:
+        f.write("[Paths]\n")
+        f.write("SystemPromptPath = prompts/system_prompt.txt\n")
+        f.write("UserPromptPath = prompts/user_prompt.txt\n")
+        f.write("SupportFolder = support/\n")
+        f.write("SubmissionsFolder = submissions/\n")
+        f.write("OutputFolder = output/\n")
+        f.write("[API]\n")
+        f.write("Key = test_api_key\n")
+        f.write("BaseURL = https://api.openai.com\n")
+        f.write("DefaultModel = gpt-3.5-turbo\n")
+        f.write("Temperature = 0.7\n")
+        f.write("SSLVerify = True\n")
+        f.write("[Models]\n")
+        f.write("gpt-3.5-turbo = gpt-3.5-turbo\n")
+
     # Load environment variables
     load_dotenv()
 
@@ -54,8 +72,9 @@ def test_api(mock_openai):
     if not os.path.exists(submissions_folder):
         os.makedirs(submissions_folder)
     submission_file = os.path.join(submissions_folder, "test_submission.docx")
-    with open(submission_file, "w") as f:
-        f.write("This is a test submission.")
+    document = Document()
+    document.add_paragraph("This is a test submission.")
+    document.save(submission_file)
 
     # Test with real submission
     success, feedback = assessor.grade_submission(
@@ -67,3 +86,6 @@ def test_api(mock_openai):
     )
     assert success is True
     assert feedback == "Test feedback"
+
+    # Clean up the dummy config file
+    os.remove("config.ini")
