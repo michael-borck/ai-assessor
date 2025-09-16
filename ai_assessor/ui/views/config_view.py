@@ -10,7 +10,14 @@ class ConfigView(ttk.Frame):
     Configuration tab of the application.
     """
 
-    def __init__(self, parent, config_manager, string_vars, available_models=None, master_gui=None):
+    def __init__(
+        self,
+        parent,
+        config_manager,
+        string_vars,
+        available_models=None,
+        master_gui=None,
+    ):
         """
         Initialize the configuration view.
 
@@ -45,10 +52,16 @@ class ConfigView(ttk.Frame):
         """Callback for when an API-related setting changes."""
         # Update config_manager with the new values
         self.config_manager.set_value("API", "Key", self.string_vars["api_key"].get())
-        self.config_manager.set_value("API", "BaseURL", self.string_vars["base_url"].get())
+        self.config_manager.set_value(
+            "API", "BaseURL", self.string_vars["base_url"].get()
+        )
         self.config_manager.set_value("API", "SSLVerify", self.ssl_verify_var.get())
-        self.config_manager.set_value("API", "DefaultModel", self.string_vars["model"].get())
-        self.config_manager.set_value("API", "Temperature", self.string_vars["temperature"].get())
+        self.config_manager.set_value(
+            "API", "DefaultModel", self.string_vars["model"].get()
+        )
+        self.config_manager.set_value(
+            "API", "Temperature", self.string_vars["temperature"].get()
+        )
 
         if self.master_gui:
             self.master_gui.update_api_client_settings()
@@ -455,9 +468,7 @@ class ConfigView(ttk.Frame):
             models = client.list_models()
             model_ids = [model.id for model in models.data]
             messagebox.showinfo(
-                "Connection Successful",
-                f"Successfully connected to the provider. Found {len(model_ids)} models:\n\n"
-                + "\n".join(model_ids),
+                "Connection Successful", "Successfully connected to the LLM provider."
             )
         except ValueError as e:
             # Handle validation errors (missing API key/base URL)

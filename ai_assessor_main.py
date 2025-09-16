@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 """
+#!/usr/bin/env python3
 AI Assessor - An AI-powered tool for grading student submissions.
 """
 
@@ -11,11 +11,11 @@ import tkinter as tk
 # This is a workaround for a bug in some Linux distributions where tkinter
 # can crash in multi-threaded applications.
 # See: https://stackoverflow.com/questions/323972/is-tkinter-thread-safe
-try:
-    x11 = ctypes.cdll.LoadLibrary("libX11.so")
-    x11.XInitThreads()
-except Exception:
-    print("Warning: Could not initialize Xlib for multi-threaded mode.")
+# try:
+# x11 = ctypes.cdll.LoadLibrary("libX11.so")
+# x11.XInitThreads()
+# except Exception:
+# print("Warning: Could not initialize Xlib for multi-threaded mode.")
 
 from dotenv import load_dotenv
 
