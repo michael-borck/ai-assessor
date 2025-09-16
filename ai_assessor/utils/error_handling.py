@@ -59,10 +59,9 @@ class ErrorHandler:
         if context:
             error_msg = f"{context}: {error_msg}"
 
-        logging.error(error_msg)
-        logging.debug(traceback.format_exc())
-
-        return error_msg
+        full_error_msg = f"{error_msg}\n\nTraceback:\n{traceback.format_exc()}"
+        logging.error(full_error_msg)
+        return full_error_msg
 
     @staticmethod
     def handle_file_error(error, file_path=None):
