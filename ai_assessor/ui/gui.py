@@ -1,5 +1,6 @@
 import threading
 import time
+import logging
 import tkinter as tk
 from tkinter import PhotoImage, messagebox, ttk
 
