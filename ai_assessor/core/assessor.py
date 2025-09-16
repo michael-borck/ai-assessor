@@ -120,6 +120,13 @@ class Assessor:
             if not isinstance(temperature, float) or temperature < 0 or temperature > 1:
                 temperature = float(self.config.get_value("API", "Temperature", "0.7"))
 
+            # Update API client with the latest settings from config
+            self.api_client.update(
+                api_key=self.config.get_value("API", "Key"),
+                base_url=self.config.get_value("API", "BaseURL"),
+                ssl_verify=self.config.get_value("API", "SSLVerify", "True").lower() == "true",
+            )
+
             # Call the API
             feedback = self.api_client.generate_assessment(
                 system_content=system_content,
