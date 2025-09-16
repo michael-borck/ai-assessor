@@ -47,8 +47,6 @@ class ConfigView(ttk.Frame):
             self.master_gui.update_api_client_settings()
 
     def setup_ui(self):
-
-    def setup_ui(self):
         """Set up the UI elements for the configuration tab."""
         # Configure grid layout
         self.columnconfigure(0, weight=1)
