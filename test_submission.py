@@ -46,7 +46,7 @@ def main():
     api_client = OpenAIClient(api_key, base_url, ssl_verify)
 
     # Test connection first
-    print(f"\n=== Testing Connection ===")
+    print("\n=== Testing Connection ===")
     print(f"Base URL: {base_url or 'OpenAI default'}")
     print(f"Model: {model}")
     print(f"SSL Verify: {ssl_verify}")
@@ -83,7 +83,7 @@ def main():
         print(f"\n✗ No .docx files found in '{submissions_folder}'")
         return
 
-    print(f"\n=== Found Submissions ===")
+    print("\n=== Found Submissions ===")
     for i, file in enumerate(docx_files):
         print(f"{i+1}. {file}")
 
@@ -108,7 +108,7 @@ def main():
         )
 
         if success:
-            print(f"✓ SUCCESS! Submission processed")
+            print("✓ SUCCESS! Submission processed")
             print(f"Feedback length: {len(feedback)} characters")
             print(f"First 300 chars:\n{feedback[:300]}...")
         else:
@@ -123,7 +123,7 @@ def main():
     # Check log file for additional details
     log_file = os.path.expanduser("~/aiassessor.log")
     if os.path.exists(log_file):
-        print(f"\n=== Recent Log Entries ===")
+        print("\n=== Recent Log Entries ===")
         with open(log_file, "r") as f:
             lines = f.readlines()
             for line in lines[-10:]:  # Show last 10 lines
