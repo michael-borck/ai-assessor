@@ -466,7 +466,7 @@ class ConfigView(ttk.Frame):
                 api_key=api_key, base_url=base_url, ssl_verify=ssl_verify
             )
             models = client.list_models()
-            model_ids = [model.id for model in models.data]
+            
             messagebox.showinfo(
                 "Connection Successful", "Successfully connected to the LLM provider."
             )
