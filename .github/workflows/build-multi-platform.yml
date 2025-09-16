@@ -24,8 +24,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Write version to __version__.py
-      run: echo "__version__ = '${{ env.RELEASE_TAG }}'" > ai_assessor/__version__.py
+    - name: Write version to __init__.py
+      run: echo "__version__ = '${{ env.RELEASE_TAG }}'" > ai_assessor/__init__.py
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -83,8 +83,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Write version to __version__.py
-      run: echo "__version__ = '${{ needs.build-windows.outputs.RELEASE_TAG }}'" > ai_assessor/__version__.py
+    - name: Write version to __init__.py
+      run: echo "__version__ = '${{ needs.build-windows.outputs.RELEASE_TAG }}'" > ai_assessor/__init__.py
 
     - name: Set up Python
       uses: actions/setup-python@v4
