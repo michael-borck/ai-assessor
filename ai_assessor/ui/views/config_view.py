@@ -10,7 +10,7 @@ class ConfigView(ttk.Frame):
     Configuration tab of the application.
     """
 
-    def __init__(self, parent, config_manager, string_vars, available_models=None):
+    def __init__(self, parent, config_manager, string_vars, available_models=None, master_gui=None):
         """
         Initialize the configuration view.
 
@@ -29,9 +29,24 @@ class ConfigView(ttk.Frame):
             value=self.config_manager.get_value("API", "SSLVerify", "True").lower()
             == "true"
         )
+        self.master_gui = master_gui
 
         # Setup UI
         self.setup_ui()
+
+        # Bind API-related StringVars to update the API client
+        self.string_vars["api_key"].trace_add("write", self._on_api_setting_change)
+        self.string_vars["base_url"].trace_add("write", self._on_api_setting_change)
+        self.ssl_verify_var.trace_add("write", self._on_api_setting_change)
+        self.string_vars["model"].trace_add("write", self._on_api_setting_change)
+        self.string_vars["temperature"].trace_add("write", self._on_api_setting_change)
+
+    def _on_api_setting_change(self, *args):
+        """Callback for when an API-related setting changes."""
+        if self.master_gui:
+            self.master_gui.update_api_client_settings()
+
+    def setup_ui(self):
 
     def setup_ui(self):
         """Set up the UI elements for the configuration tab."""
