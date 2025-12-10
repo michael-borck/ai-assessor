@@ -105,16 +105,40 @@ class OpenAIClient:
             logging.info(f"  System content length: {len(system_content)} chars")
             logging.info(f"  User content length: {len(user_content)} chars")
 
-            # Use the new API format
-            response = self.client.chat.completions.create(
-                model=model,
-                messages=[
+            # Build base parameters
+            params = {
+                "model": model,
+                "messages": [
                     {"role": "system", "content": system_content},
                     {"role": "user", "content": user_content},
                 ],
-                temperature=temperature,
-                max_tokens=max_tokens,
+            }
+
+            # Check if this is a GPT-5 or reasoning model (o1, o3, o4, etc.)
+            # These models require max_completion_tokens instead of max_tokens
+            # and don't support the temperature parameter
+            model_lower = model.lower()
+            is_reasoning_model = (
+                "gpt-5" in model_lower
+                or "o1" in model_lower
+                or "o3" in model_lower
+                or "o4" in model_lower
             )
+
+            if is_reasoning_model:
+                # GPT-5 and reasoning models use max_completion_tokens
+                # and don't support temperature
+                params["max_completion_tokens"] = max_tokens
+                logging.info(
+                    f"Using max_completion_tokens for reasoning model: {model}"
+                )
+            else:
+                # Standard models use max_tokens and temperature
+                params["max_tokens"] = max_tokens
+                params["temperature"] = temperature
+
+            # Use the new API format
+            response = self.client.chat.completions.create(**params)
 
             # Extract the response (new API format)
             result = response.choices[0].message.content.strip()
