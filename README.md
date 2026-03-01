@@ -1,5 +1,9 @@
 # AI Assessor
 
+<!-- BADGES:START -->
+[![edtech](https://img.shields.io/badge/-edtech-4caf50?style=flat-square)](https://github.com/topics/edtech) [![artificial-intelligence](https://img.shields.io/badge/-artificial--intelligence-blue?style=flat-square)](https://github.com/topics/artificial-intelligence) [![assessment](https://img.shields.io/badge/-assessment-blue?style=flat-square)](https://github.com/topics/assessment) [![automation](https://img.shields.io/badge/-automation-blue?style=flat-square)](https://github.com/topics/automation) [![cli-tool](https://img.shields.io/badge/-cli--tool-blue?style=flat-square)](https://github.com/topics/cli-tool) [![education](https://img.shields.io/badge/-education-blue?style=flat-square)](https://github.com/topics/education) [![grading](https://img.shields.io/badge/-grading-blue?style=flat-square)](https://github.com/topics/grading) [![gui](https://img.shields.io/badge/-gui-blue?style=flat-square)](https://github.com/topics/gui) [![openai](https://img.shields.io/badge/-openai-412991?style=flat-square)](https://github.com/topics/openai) [![python](https://img.shields.io/badge/-python-3776ab?style=flat-square)](https://github.com/topics/python)
+<!-- BADGES:END -->
+
 > **⚠️ Legacy Project Notice**
 > This is a legacy codebase in maintenance mode. Development is limited to critical bug fixes only. New feature development has been discontinued.
 
